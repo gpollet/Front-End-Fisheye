@@ -1,36 +1,28 @@
-import { photographerFactory } from "../factories/photographerFactory.js"
+// import { PhotographerFactory } from "../factories/photographerFactory.js"
+import { Photographer } from "../models/Photographer.js"
 import { createHeader } from "../templates/header.js"
-
-async function getPhotographers() {
-  let photographers = []
-  await fetch("../data/photographers.json")
-    .then((res) => res.json())
-    .then((data) => {
-      photographers = data.photographers
-      const photographersPhotos = data.media
-      // console.log(photographersPhotos)
-    })
-    .catch((err) => {
-      console.error(err)
-    })
-  return photographers
-}
-
-async function displayData(photographers) {
-  photographers.forEach((photographer) => {
-    const photographerModel = photographerFactory(photographer)
-    const userCardDOM = photographerModel.getUserCardDOM()
-    document
-      .querySelector(".photographer_section")
-      .appendChild(userCardDOM)
-  })
-}
+import { PhotographerCard } from "../templates/homePage/PhotographerCard.js"
+import { getAllData } from "../api/Api.js"
 
 async function init() {
-  // Récupère les datas des photographes et crée le header
+  // Create the main page header, then get photographers data and display them
   createHeader("mainPage")
-  const photographers = await getPhotographers()
-  displayData(photographers)
+  displayData(
+    await getAllData().then((data) => {
+      return data.photographers.map(
+        (photographer) => new Photographer(photographer)
+      )
+    })
+  )
+}
+
+function displayData(photographers) {
+  photographers.forEach((photographer) => {
+    const Template = new PhotographerCard(photographer)
+    document
+      .querySelector(".photographer_section")
+      .appendChild(Template.createPhotographerCard())
+  })
 }
 
 init()

@@ -1,22 +1,37 @@
-//Mettre le code JavaScript lié à la page photographer.html
-
 import { createHeader } from "../templates/header.js"
-import { displayModal, closeModal } from "../utils/contactForm.js"
+import { getAllData } from "../api/Api.js"
+import { closeModal } from "../utils/contactForm.js"
+import { PhotographerHeader } from "../templates/photographerPage/photographerHeader.js"
+import { Photographer } from "../models/Photographer.js"
 
 // 1- Variables
 // DOM
-
-const contactButton = document.querySelector(".contact_button")
 const closeModalButton = document.querySelector(".close_modal_button")
 
 // 2- Code moteur
-contactButton.addEventListener("click", displayModal)
 closeModalButton.addEventListener("click", closeModal)
 
 createHeader()
 
-// Get param from URL to display the selected photographer
-const params = new URL(document.location).searchParams
-const photographerId = params.get("id")
-
 // 3- Fonctions
+
+// Get data from API, find the photographer with the same id as the param in search bar, then create elements of the page with it
+async function init() {
+  getAllData()
+    .then((photographerList) => {
+      return photographerList.photographers.find(
+        (photographer) =>
+          photographer.id ==
+          new URL(document.location).searchParams.get("id")
+      )
+    })
+    .then((matchingPhotographer) => {
+      return new Photographer(matchingPhotographer)
+    })
+    .then((photographer) => {
+      const Template = new PhotographerHeader(photographer)
+      document.querySelector("#main").appendChild(Template.createPhotographerHeader())
+    })
+}
+
+init()
