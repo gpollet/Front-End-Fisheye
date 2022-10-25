@@ -2,11 +2,13 @@ import { Photographer } from "../models/Photographer.js"
 import { API } from "../api/Api.js"
 import { createHeader } from "../components/WebsiteHeader.js"
 import { ModalDisplayButtons } from "../components/ModalDisplayButtons.js"
-import { MediaFactory } from "../factories/mediaFactory.js"
 import { PhotographerMedia } from "../components/PhotographerMedia.js"
 
 // 1- Variables
-// DOM
+
+// Global variable tracking the medias liked by user
+export const likedMedia = []
+
 const closeModalButton = document.querySelector(".close_modal_button")
 
 // 2- Code moteur
@@ -26,19 +28,36 @@ async function init() {
   addModalEventListeners()
 }
 
-function displayData(data) {
+export function displayData(data) {
   new Photographer(
     data.photographer.find((photographer) => photographer)
   ).displayProfile()
-  const photographerMedias = data.media.map(
-    (element) => new MediaFactory(element)
-  )
-  photographerMedias.forEach((element) => {
+  PhotographerMedia.createDropdownOrder()
+  new PhotographerMedia().createMediaSection()
+  data.media.forEach((element) => {
     const Template = new PhotographerMedia(element)
-    Template.createMediaSection()
     document
       .querySelector(".photographer-media")
       .appendChild(Template.createMediaList())
+    Template.addLikes()
+  })
+}
+
+export async function loadSortedMedia() {
+  const sortingParameter = document.getElementById("order-by").value
+  const mediaList = document.querySelectorAll(".mediaCard")
+  for (let mediaToRemove of mediaList) {
+    document.querySelector(".photographer-media").removeChild(mediaToRemove)
+  }
+  await API.getPhotographersByID(sortingParameter)
+  .then((data) => {
+    data.media.forEach((element) => {
+      const Template = new PhotographerMedia(element)
+      document
+        .querySelector(".photographer-media")
+        .appendChild(Template.createMediaList())
+      Template.addLikes()
+    })
   })
 }
 
