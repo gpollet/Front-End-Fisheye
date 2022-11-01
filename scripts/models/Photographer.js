@@ -1,4 +1,7 @@
+//import { ModalLightbox } from "../components/Lightbox.js"
+import { PhotographerMedia } from "../components/PhotographerMedia.js"
 import { PhotographerProfile } from "../components/PhotographerProfile.js"
+import { displayedPhotographerData } from "../store/store.js"
 
 export class Photographer {
   constructor(photographer) {
@@ -10,21 +13,32 @@ export class Photographer {
     this.portrait = photographer.portrait
     this.price = photographer.price
     this.tagline = photographer.tagline
-    this.likes = photographer.totalLikes
+    this.totalLikes = photographer.totalLikes
   }
 
   displayHome() {
-      const Template = new PhotographerProfile(this)
-      document
-        .querySelector(".photographer_section")
-        .appendChild(Template.createPhotographerCard())
+    const template = new PhotographerProfile(this)
+    document
+      .querySelector(".photographer_section")
+      .appendChild(template.createPhotographerCard())
   }
 
   displayProfile() {
-    const Template = new PhotographerProfile(this)
+    const template = new PhotographerProfile(this)
     document
       .querySelector("#main")
-      .appendChild(Template.createPhotographerHeader())
-    Template.createprofilePageInsert(this.likes)
+      .appendChild(template.createPhotographerHeader())
+    template.createprofilePageInsert()
+    PhotographerMedia.createDropdownOrder()
+    PhotographerMedia.createMediaSection()
+    displayedPhotographerData.media.forEach((element) => {
+      const template = new PhotographerMedia(element)
+      document
+        .querySelector(".photographer-media")
+        .appendChild(template.createMediaList())
+      template.addLikes()
+      template.addLightboxEventListener()
+    })
+    PhotographerMedia.sortMedia()
   }
 }
