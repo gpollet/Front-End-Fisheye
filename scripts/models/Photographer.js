@@ -1,4 +1,3 @@
-//import { ModalLightbox } from "../components/Lightbox.js"
 import { PhotographerMedia } from "../components/PhotographerMedia.js"
 import { PhotographerProfile } from "../components/PhotographerProfile.js"
 import { displayedPhotographerData } from "../store/store.js"
@@ -16,6 +15,7 @@ export class Photographer {
     this.totalLikes = photographer.totalLikes
   }
 
+  // Populates home page with photographers' cards
   displayHome() {
     const template = new PhotographerProfile(this)
     document
@@ -23,21 +23,21 @@ export class Photographer {
       .appendChild(template.createPhotographerCard())
   }
 
+  // Creates the photographer's profile page, and sorts media by popularity by default
   displayProfile() {
     const template = new PhotographerProfile(this)
     document
       .querySelector("#main")
       .appendChild(template.createPhotographerHeader())
     template.createprofilePageInsert()
-    PhotographerMedia.createDropdownOrder()
     PhotographerMedia.createMediaSection()
     displayedPhotographerData.media.forEach((element) => {
-      const template = new PhotographerMedia(element)
+      const mediaCard = new PhotographerMedia(element)
       document
         .querySelector(".photographer-media")
-        .appendChild(template.createMediaList())
-      template.addLikes()
-      template.addLightboxEventListener()
+        .appendChild(mediaCard.createMediaCard())
+      mediaCard.addLikes()
+      mediaCard.addLightboxEventListener()
     })
     PhotographerMedia.sortMedia()
   }
